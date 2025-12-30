@@ -92,16 +92,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.UserScalarFieldEnum = {
-  id: 'id',
-  email: 'email',
-  nom: 'nom',
-  password: 'password',
-  role: 'role',
-  createdAt: 'createdAt',
-  prenom: 'prenom'
-};
-
 exports.Prisma.PlayerScalarFieldEnum = {
   prenom: 'prenom',
   nom: 'nom',
@@ -121,6 +111,15 @@ exports.Prisma.TeamScalarFieldEnum = {
   id: 'id'
 };
 
+exports.Prisma.UserScalarFieldEnum = {
+  id: 'id',
+  prenom: 'prenom',
+  nom: 'nom',
+  email: 'email',
+  password: 'password',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -138,10 +137,10 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  User: 'User',
   Player: 'Player',
   Position: 'Position',
-  Team: 'Team'
+  Team: 'Team',
+  User: 'User'
 };
 /**
  * Create the Client
@@ -151,10 +150,10 @@ const config = {
   "clientVersion": "7.2.0",
   "engineVersion": "0c8ef2ce45c83248ab3df073180d5eda9e8be7a3",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel User {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  nom       String?\n  password  String\n  role      String   @default(\"USER\")\n  createdAt DateTime @default(now())\n  prenom    String?\n}\n\nmodel Player {\n  prenom     String\n  nom        String\n  id         Int      @id @default(autoincrement())\n  teamId     Int      @map(\"team_id\")\n  positionId Int      @map(\"position_id\")\n  position   Position @relation(fields: [positionId], references: [id])\n  team       Team     @relation(fields: [teamId], references: [id])\n}\n\nmodel Position {\n  nom     String   @unique\n  id      Int      @id @default(autoincrement())\n  players Player[]\n}\n\nmodel Team {\n  nom     String\n  pays    String?\n  id      Int      @id @default(autoincrement())\n  players Player[]\n}\n"
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../src/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Player {\n  prenom     String\n  nom        String\n  id         Int      @id @default(autoincrement())\n  teamId     Int      @map(\"team_id\")\n  positionId Int      @map(\"position_id\")\n  position   Position @relation(fields: [positionId], references: [id])\n  team       Team     @relation(fields: [teamId], references: [id])\n}\n\nmodel Position {\n  nom     String   @unique\n  id      Int      @id @default(autoincrement())\n  players Player[]\n}\n\nmodel Team {\n  nom     String\n  pays    String?\n  id      Int      @id @default(autoincrement())\n  players Player[]\n}\n\nmodel User {\n  id        Int      @id @default(autoincrement())\n  prenom    String\n  nom       String\n  email     String   @unique\n  password  String\n  createdAt DateTime @default(now()) @map(\"created_at\")\n}\n"
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"role\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"prenom\",\"kind\":\"scalar\",\"type\":\"String\"}],\"dbName\":null},\"Player\":{\"fields\":[{\"name\":\"prenom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"teamId\",\"kind\":\"scalar\",\"type\":\"Int\",\"dbName\":\"team_id\"},{\"name\":\"positionId\",\"kind\":\"scalar\",\"type\":\"Int\",\"dbName\":\"position_id\"},{\"name\":\"position\",\"kind\":\"object\",\"type\":\"Position\",\"relationName\":\"PlayerToPosition\"},{\"name\":\"team\",\"kind\":\"object\",\"type\":\"Team\",\"relationName\":\"PlayerToTeam\"}],\"dbName\":null},\"Position\":{\"fields\":[{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"players\",\"kind\":\"object\",\"type\":\"Player\",\"relationName\":\"PlayerToPosition\"}],\"dbName\":null},\"Team\":{\"fields\":[{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pays\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"players\",\"kind\":\"object\",\"type\":\"Player\",\"relationName\":\"PlayerToTeam\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Player\":{\"fields\":[{\"name\":\"prenom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"teamId\",\"kind\":\"scalar\",\"type\":\"Int\",\"dbName\":\"team_id\"},{\"name\":\"positionId\",\"kind\":\"scalar\",\"type\":\"Int\",\"dbName\":\"position_id\"},{\"name\":\"position\",\"kind\":\"object\",\"type\":\"Position\",\"relationName\":\"PlayerToPosition\"},{\"name\":\"team\",\"kind\":\"object\",\"type\":\"Team\",\"relationName\":\"PlayerToTeam\"}],\"dbName\":null},\"Position\":{\"fields\":[{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"players\",\"kind\":\"object\",\"type\":\"Player\",\"relationName\":\"PlayerToPosition\"}],\"dbName\":null},\"Team\":{\"fields\":[{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"pays\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"players\",\"kind\":\"object\",\"type\":\"Player\",\"relationName\":\"PlayerToTeam\"}],\"dbName\":null},\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"prenom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nom\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\",\"dbName\":\"created_at\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.compilerWasm = {
   getRuntime: async () => require('./query_compiler_bg.js'),

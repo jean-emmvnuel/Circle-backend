@@ -1,72 +1,82 @@
-# NestJS + Prisma + Supabase Boilerplate 🚀
+# 🚀 NestJS + Prisma + Supabase (Boilerplate Pro)
 
-Ce projet est une base solide (Boilerplate) pour construire des APIs robustes avec **NestJS**, **Prisma ORM** et **Supabase**. Il inclut une configuration optimisée pour la connexion aux bases de données managées (via Connection Pooling).
-
-## 🛠 Technologies utilisées
-- **Framework :** [NestJS](https://nestjs.com/)
-- **ORM :** [Prisma](https://www.prisma.io/)
-- **Base de données :** [Supabase (PostgreSQL)](https://supabase.com/)
-- **Connecteur :** `@prisma/adapter-pg` (pour une compatibilité Wasm/Edge optimale)
+Ce projet est un Starter Kit (Boilerplate) moderne et robuste pour le développement d'APIs REST performantes. Il combine la puissance de **NestJS**, la flexibilité de **Prisma ORM** et la scalabilité de **Supabase**.
 
 ---
 
-## 🚀 Installation & Démarrage
+## 🛠️ Stack Technique
 
-1. **Clonage & Dépendances :**
-   ```bash
-   npm install
-   ```
-
-2. **Configuration de l'environnement :**
-   Créez un fichier `.env` à la racine :
-   ```env
-   DATABASE_URL="postgresql://postgres.[ID_PROJET]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true"
-   ```
-
-3. **Génération du client Prisma :**
-   ```bash
-   npx prisma generate
-   ```
-
-4. **Lancement en développement :**
-   ```bash
-   npm run start:dev
-   ```
+*   **Framework :** [NestJS](https://nestjs.com/) (Architecture modulaire, TypeScript)
+*   **ORM :** [Prisma](https://www.prisma.io/) (Gestion de schéma, migrations, typage automatique)
+*   **Base de Données :** [Supabase](https://supabase.com/) (PostgreSQL managé)
+*   **Authentification :** 
+    *   [Passport.js](https://www.passportjs.org/) & [JWT](https://jwt.io/)
+    *   Hashage des mots de passe avec **Bcrypt**
+*   **Documentation :** [Swagger](https://swagger.io/) (Disponible sur `/api`)
+*   **Validation :** `class-validator` & `class-transformer`
 
 ---
 
-## ⚙️ Comment adapter ce boilerplate à un nouveau projet ?
+## ✨ Fonctionnalités Clés
 
-### 1. Variables d'Environnement (`.env`)
-Remplacez `DATABASE_URL` par l'URL de votre nouveau projet Supabase. 
-> **Note :** Utilisez toujours le port `6543` (Pooler) avec Supabase pour éviter les erreurs de connexion épuisée.
+*   **Système d'Authentification Complet :** Inscription, Connexion et récupération du profil sécurisée.
+*   **CRUD complets :** Modules pour la gestion des **Équipes**, des **Joueurs** et des **Positions**.
+*   **Connexion Optimisée :** Configuration spéciale pour Supabase utilisant le **Connection Pooler** (port 6543) avec `pgbouncer`, garantissant une stabilité maximale en production.
+*   **Validation Globale :** Protection automatique des entrées API grâce aux Pipes de validation.
+*   **Documentation Interactive :** Swagger UI intégré pour tester les routes en un clic.
 
-### 2. Schéma de Base de Données (`prisma/schema.prisma`)
-- Modifiez les modèles (`model User`, `model Post`, etc.) selon vos besoins.
-- **Important :** Ne changez pas la partie `generator client` sauf si vous voulez déplacer le dossier de sortie. Actuellement, il génère le client dans `src/generated/prisma`.
+---
 
-### 3. Synchronisation de la Base
-Après avoir modifié votre `schema.prisma` :
+## ⚙️ Installation et Configuration
+
+### 1. Cloner le projet et installer les dépendances
 ```bash
-# Pour créer une migration et mettre à jour la base
-npx prisma migrate dev --name init
+npm install
+```
 
-# Ou simplement générer le nouveau client si la base est déjà prête
+### 2. Configurer les variables d'environnement
+Créez un fichier `.env` à la racine et configurez votre URL Supabase :
+```env
+# Port 6543 pour le pooling (recommandé pour l'app)
+DATABASE_URL="postgresql://postgres.[ID_PROJET]:[PASSWORD]@aws-1-eu-west-3.pooler.supabase.com:6543/postgres?pgbouncer=true"
+
+# Clé secrète pour les tokens JWT
+JWT_SECRET="votre_cle_secrete_ultra_securisee"
+```
+
+### 3. Initialiser Prisma
+Générez le client Prisma pour synchroniser les types :
+```bash
 npx prisma generate
 ```
 
-### 4. Service Prisma (`src/prisma.service.ts`)
-Ce fichier est le cœur de la connexion. Il utilise `pg.Pool` et `PrismaPg`. Si vous changez de fournisseur de base de données (autre que Supabase), vous devrez peut-être simplifier ce service pour utiliser le `PrismaClient` standard sans adaptateur.
+### 4. Lancer l'application
+```bash
+# Mode développement
+npm run start:dev
+```
+
+L'API sera accessible sur : `http://localhost:3001`
+La documentation Swagger sur : `http://localhost:3001/api`
 
 ---
 
-## 📂 Structure du projet
-- `src/generated/prisma` : Client Prisma généré (ignorer par Git).
-- `src/prisma.service.ts` : Service global de connexion.
-- `prisma/schema.prisma` : Définition de vos modèles de données.
-- `prisma.config.ts` : Configuration avancée de Prisma.
+## 📂 Organisation du Projet
 
-## 💡 Astuces & Dépannage
-- **Erreur EADDRINUSE :** Le port 3000 est déjà utilisé. Tuez le processus ou changez le port dans `src/main.ts`.
-- **Erreur P1001 :** Le serveur de base de données est injoignable. Vérifiez l'adresse dans le `.env` et assurez-vous que le projet Supabase n'est pas en pause.
-- **Erreur P1000 :** Mot de passe incorrect dans l'URL de connexion.
+*   `src/auth` : Logique d'authentification (JWT, Strategies, DTOs).
+*   `src/equipes`, `src/joueurs`, `src/positions` : Modules métier (CRUD).
+*   `src/prisma.service.ts` : Service de connexion centralisé utilisant l'adaptateur `pg.Pool` pour une compatibilité parfaite avec Supabase.
+*   `prisma/schema.prisma` : Définition des modèles de données.
+
+---
+
+## 💡 Notes sur la Base de Données (Supabase)
+
+Ce boilerplate est configuré pour utiliser le **Pooler de Supabase**. 
+- **Application :** Utilisez le port `6543` avec `?pgbouncer=true`.
+- **Migrations :** Pour `prisma migrate dev`, il est recommandé d'utiliser une connexion directe (port `5432`) sans pgbouncer pour éviter les erreurs de transaction.
+
+---
+
+## 📜 Licence
+Projet libre d'utilisation. Développé pour être une base solide pour tout nouveau projet NestJS.

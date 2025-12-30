@@ -7,16 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  nom       String?
-  password  String
-  role      String   @default("USER")
-  createdAt DateTime @default(now())
-  prenom    String?
-}
-
 model Player {
   prenom     String
   nom        String
@@ -38,4 +28,13 @@ model Team {
   pays    String?
   id      Int      @id @default(autoincrement())
   players Player[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  prenom    String
+  nom       String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now()) @map("created_at")
 }
