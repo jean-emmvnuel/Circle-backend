@@ -4,27 +4,16 @@ import { IsEmail, IsNotEmpty, IsString, MinLength } from "class-validator";
 
 export class registerDto {
     @ApiProperty({
-        example: 'John',
-        description: 'Prenom de l\'utilisateur',
+        example: 'mvnou_official',
+        description: 'nom de l\'utilisateur',
         required: true,
         minLength: 3,
         maxLength: 50,
     })
-    @IsString({ message: 'Le prenom doit etre une chaine de caracteres' })
-    @IsNotEmpty({ message: 'Le prenom est obligatoire' })
-    prenom: string;
+    @IsString({ message: 'Le nom de l\'utilisateur doit etre une chaine de caracteres' })
+    @IsNotEmpty({ message: 'Le nom de l\'utilisateur est obligatoire' })
+    username: string;
 
-
-    @ApiProperty({
-        example: 'Doe',
-        description: 'Nom de l\'utilisateur',
-        required: true,
-        minLength: 3,
-        maxLength: 50,
-    })
-    @IsString({ message: 'Le nom doit etre une chaine de caracteres' })
-    @IsNotEmpty({ message: 'Le nom est obligatoire' })
-    nom: string;
 
 
     @ApiProperty({

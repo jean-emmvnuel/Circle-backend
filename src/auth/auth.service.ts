@@ -10,7 +10,7 @@ export class AuthService {
     constructor(private readonly prisma: PrismaService, private readonly jwtService: JwtService) { }
 
     async register(data: registerDto) {
-        const { prenom, nom, email, password } = data;
+        const { username, email, password } = data;
 
         const existingEmail = await this.prisma.user.findUnique({ where: { email } });
         if (existingEmail) {
@@ -21,15 +21,15 @@ export class AuthService {
 
         const user = await this.prisma.user.create({
             data: {
-                prenom,
-                nom,
+                username,
                 email,
+                role: "USER",
                 password: hashedPassword,
             },
             select: {
                 id: true,
-                prenom: true,
-                nom: true,
+                username: true,
+                role: true,
                 email: true,
                 createdAt: true,
             },
@@ -37,13 +37,19 @@ export class AuthService {
         const payload = {
             sub: user.id,
             email: user.email,
+            role: user.role,
         };
         const token = await this.jwtService.signAsync(payload);
         return {
             status: 201,
-            message: "otilisateur creer avec succes",
+            message: "utilisateur creer avec succes",
             data: {
-                user,
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    email: user.email,
+                    createdAt: user.createdAt,
+                },
                 token,
             },
         }
@@ -52,12 +58,12 @@ export class AuthService {
     async login(data: loginDto) {
         const { email, password } = data;
 
-        const user = await this.prisma.user.findUnique({ 
+        const user = await this.prisma.user.findUnique({
             where: { email },
             select: {
                 id: true,
-                prenom: true,
-                nom: true,
+                username: true,
+                role: true,
                 email: true,
                 password: true,
                 createdAt: true,
@@ -75,6 +81,7 @@ export class AuthService {
         const payload = {
             sub: user.id,
             email: user.email,
+            role: user.role,
         };
         const token = await this.jwtService.signAsync(payload);
         return {
@@ -83,8 +90,7 @@ export class AuthService {
             data: {
                 user: {
                     id: user.id,
-                    prenom: user.prenom,
-                    nom: user.nom,
+                    username: user.username,
                     email: user.email,
                     createdAt: user.createdAt,
                 },
@@ -93,13 +99,12 @@ export class AuthService {
         }
     }
 
-    async validateUser(userId: number) {
+    async validateUser(userId: string) {
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
             select: {
                 id: true,
-                prenom: true,
-                nom: true,
+                username: true,
                 email: true,
                 createdAt: true,
             },
@@ -108,5 +113,12 @@ export class AuthService {
             throw new NotFoundException("utilisateur non trouve");
         }
         return user;
+    }
+
+    async logout() {
+        return {
+            status: 200,
+            message: "Déconnexion réussie. Pensez à supprimer le token côté client.",
+        };
     }
 }

@@ -6,7 +6,7 @@ import { JwtAuthGuard } from './jwt.auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) { }
 
     @Post('/register')
     async register(@Body() data: registerDto) {
@@ -22,5 +22,11 @@ export class AuthController {
     @Get("/me")
     async me(@Request() req) {
         return this.authService.validateUser(req.user.sub);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post("/logout")
+    async logout() {
+        return this.authService.logout();
     }
 }

@@ -69,6 +69,56 @@ Circle est le backend d'un réseau social innovant dédié aux informaticiens. C
 | `receiveMessage` | Reçu par le destinataire en temps réel |
 | `broadcast` | (Admin) Envoi groupé à tous les sockets connectés |
 
+## 🔌 Connexion Frontend (Socket.io)
+
+Pour connecter votre application frontend (Vue, React, etc.) au système temps réel de Circle :
+
+### 1. Installation du client
+```bash
+npm install socket.io-client
+```
+
+### 2. Initialisation de la connexion
+Il est recommandé d'utiliser le token JWT pour sécuriser la connexion socket.
+
+```javascript
+import { io } from "socket.io-client";
+
+const socket = io("http://localhost:3001", {
+  auth: {
+    token: `Bearer ${localStorage.getItem('token')}` // Envoyer le JWT
+  }
+});
+
+socket.on("connect", () => {
+  console.log("Connecté au serveur de Circle ⭕");
+});
+```
+
+### 3. Rejoindre une conversation
+```javascript
+// Pour rejoindre un chat direct ou un groupe
+socket.emit('joinRoom', { conversationId: "ID_DE_LA_CONV" });
+```
+
+### 4. Envoyer et Recevoir
+```javascript
+// Envoyer un message
+const sendMessage = (content, conversationId) => {
+  socket.emit('sendMessage', {
+    conversationId,
+    content
+  });
+};
+
+// Écouter les nouveaux messages
+socket.on('receiveMessage', (message) => {
+  console.log("Nouveau message reçu:", message);
+  // Mettre à jour l'interface UI ici
+});
+```
+
+
 ## 🏗️ Structure de la Base de Données (Concepts)
 
 Pour supporter ces fonctionnalités, le schéma Prisma inclura :
