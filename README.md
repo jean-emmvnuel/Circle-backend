@@ -1,87 +1,81 @@
-# 🚀 NestJS + Prisma + Supabase (Boilerplate Pro)
+# Circle - Backend API ⭕
 
-Ce projet est un Starter Kit (Boilerplate) moderne et robuste pour le développement d'APIs REST performantes. Il combine la puissance de **NestJS**, la flexibilité de **Prisma ORM** et la scalabilité de **Supabase**.
+Circle est le backend d'un réseau social innovant dédié aux informaticiens. Cette plateforme permet la communication en temps réel, la gestion de communautés thématiques et l'interaction directe avec l'équipe de développement pour un feedback continu.
 
----
+## 🚀 Technologies Utilisées
 
-## 🌐 Déploiement & Documentation
+- **Framework:** [NestJS](https://nestjs.com/)
+- **Base de données:** [Supabase](https://supabase.com/) & [PostgreSQL](https://www.postgresql.org/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Temps Réel:** [Socket.io](https://socket.io/)
+- **Authentification:** JWT (JSON Web Token) & Passport
+- **Langage:** TypeScript
 
-Le projet est déployé en ligne et prêt à être testé.
+## 🛠️ Fonctionnalités Principales
 
-*   **API URL :** [https://crud-nestjs-supabase.onrender.com/](https://crud-nestjs-supabase.onrender.com/)
-*   **Documentation Swagger :** [https://crud-nestjs-supabase.onrender.com/api](https://crud-nestjs-supabase.onrender.com/api) 👈 *Testez toutes les routes directement ici !*
+### 💬 Messagerie en Temps Réel
+- **Chats Directs:** Conversations privées entre deux utilisateurs.
+- **Chats de Groupe:** Espaces de discussion restreints à plusieurs membres.
+- **Communautés de Discussion:** Salons publics organisés par **langages de programmation** ou **domaines d'expertise** (ex: JavaScript, DevOps, IA).
 
----
+### 📢 Système de Feedback & Annonces
+- **Feedback Utilisateur:** Chaque interface utilisateur intègre un chat direct avec le compte officiel **Circle** pour envoyer des retours techniques ou suggestions.
+- **Interface Admin Circle:** Tous les feedbacks sont centralisés sur le compte spécial de l'application Circle.
+- **Broadcast:** Capacité pour le compte Circle d'envoyer des annonces à l'ensemble des utilisateurs (anciens et nouveaux).
 
-## 📖 Documentation API (Swagger)
+### 📧 Messagerie vers Non-Inscrits (Workflow Email)
+- Possibilité d'envoyer un message à un utilisateur via son adresse email même s'il n'a pas encore de compte.
+- **Persistance:** Les messages sont stockés en attente.
+- **Récupération:** Dès que l'utilisateur crée un compte avec l'email correspondant, tous les messages passés sont automatiquement chargés dans son interface.
 
-L'API utilise **Swagger** (OpenAPI) pour fournir une interface interactive permettant de tester toutes les routes sans outils tiers comme Postman.
+## ⚙️ Installation
 
-### Accès
-- **En ligne :** `/api` après l'URL de déploiement.
-- **En local :** `http://localhost:3001/api`
+1. **Cloner le projet**
+   ```bash
+   git clone <repository-url>
+   cd Circle-back
+   ```
 
-### Fonctionnalités Swagger
-- **Visualisation :** Liste complète de toutes les routes (Auth, Joueurs, Equipes, Positions).
-- **Test direct :** Bouton "Try it out" pour envoyer des requêtes réelles.
-- **Validation :** Affiche les modèles de données (Schemas) attendus pour les requêtes POST/PUT.
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
 
----
+3. **Configuration des variables d'environnement**
+   Créez un fichier `.env` à la racine :
+   ```env
+   DATABASE_URL="votre_url_supabase_prisma"
+   JWT_SECRET="votre_secret_jwt"
+   ```
 
-## 🛠️ Stack Technique
+4. **Initialiser Prisma**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-*   **Framework :** [NestJS](https://nestjs.com/) (Architecture modulaire, TypeScript)
-*   **ORM :** [Prisma](https://www.prisma.io/) (Gestion de schéma, migrations, typage automatique)
-*   **Base de Données :** [Supabase](https://supabase.com/) (PostgreSQL managé)
-*   **Authentification :** 
-    *   [Passport.js](https://www.passportjs.org/) & [JWT](https://jwt.io/)
-    *   Hashage des mots de passe avec **Bcrypt**
-*   **Validation :** `class-validator` & `class-transformer`
+5. **Lancer le serveur**
+   ```bash
+   npm run start:dev
+   ```
 
----
+## 📡 Événements Socket.io (Aperçu)
 
-## ✨ Fonctionnalités Clés
+| Événement | Description |
+| :--- | :--- |
+| `connection` | Initialise la session temps réel |
+| `joinRoom` | Rejoint un groupe ou une communauté |
+| `sendMessage` | Envoie un message (direct, groupe ou feedback) |
+| `receiveMessage` | Reçu par le destinataire en temps réel |
+| `broadcast` | (Admin) Envoi groupé à tous les sockets connectés |
 
-*   **Système d'Authentification Complet :** Inscription, Connexion et récupération du profil sécurisée.
-*   **CRUD complets :** Modules pour la gestion des **Équipes**, des **Joueurs** et des **Positions**.
-*   **Connexion Optimisée :** Configuration spéciale pour Supabase utilisant le **Connection Pooler** (port 6543) avec `pgbouncer`.
-*   **Validation Globale :** Protection automatique des entrées API grâce aux Pipes de validation.
+## 🏗️ Structure de la Base de Données (Concepts)
 
----
+Pour supporter ces fonctionnalités, le schéma Prisma inclura :
+- `User`: Informations de profil et credentials.
+- `Message`: Contenu, expéditeur, destinataire (User ou Room) et email (pour les non-inscrits).
+- `Room`: Entités pour les groupes et communautés.
+- `CircleFeedback`: Table spécifique pour le suivi des retours via le compte système.
 
-## ⚙️ Installation et Configuration Locale
-
-### 1. Cloner le projet et installer les dépendances
-```bash
-npm install
-```
-
-### 2. Configurer les variables d'environnement
-Créez un fichier `.env` à la racine :
-```env
-DATABASE_URL="postgresql://postgres.[ID_PROJET]:[PASSWORD]@aws-1-eu-west-3.pooler.supabase.com:6543/postgres?pgbouncer=true"
-JWT_SECRET="votre_cle_secrete_ultra_securisee"
-```
-
-### 3. Initialiser Prisma
-```bash
-npx prisma generate
-```
-
-### 4. Lancer l'application
-```bash
-npm run start:dev
-```
-
----
-
-## 📂 Organisation du Projet
-*   `src/auth` : Authentification (JWT, Strategies, DTOs).
-*   `src/equipes`, `src/joueurs`, `src/positions` : Modules métier.
-*   `src/prisma.service.ts` : Service de connexion centralisé.
-*   `prisma/schema.prisma` : Modèles de données.
-
----
-
-## 📜 Licence
-Projet libre d'utilisation. Développé pour être une base solide pour tout nouveau projet NestJS.
+## 👨‍💻 Auteur
+Développé dans le cadre du projet **Circle** - Le réseau social des passionnés d'informatique.
