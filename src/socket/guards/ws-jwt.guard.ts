@@ -8,14 +8,19 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class WsJwtGuard implements CanActivate {
-  constructor(private jwtService: JwtService) {}
+  constructor(private jwtService: JwtService) { }
 
   canActivate(context: ExecutionContext): boolean {
     const client = context.switchToWs().getClient();
-    const token = client.handshake?.auth?.token;
+    let token = client.handshake?.auth?.token || client.handshake?.headers?.authorization;
 
     if (!token) {
       throw new UnauthorizedException('Token manquant');
+    }
+
+    // Gestion du préfixe "Bearer " si présent
+    if (token.startsWith('Bearer ')) {
+      token = token.split(' ')[1];
     }
 
     try {
@@ -29,7 +34,7 @@ export class WsJwtGuard implements CanActivate {
 
       return true;
     } catch (err) {
-      console.log(err);
+      console.log('Erreur JWT Socket:', err.message);
       throw new UnauthorizedException('Token invalide ou expiré');
     }
   }

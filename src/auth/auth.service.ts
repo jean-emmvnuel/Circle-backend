@@ -34,6 +34,16 @@ export class AuthService {
                 createdAt: true,
             },
         });
+        await this.prisma.conversationMember.updateMany({
+            where: {
+                invitedEmail: user.email,
+                userId: null,
+            },
+            data: {
+                userId: user.id,
+                invitedEmail: null,
+            },
+        });
         const payload = {
             sub: user.id,
             email: user.email,

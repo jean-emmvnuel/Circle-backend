@@ -3,7 +3,7 @@ import { PrismaService } from '../../prisma.service';
 
 @Injectable()
 export class DmService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // 🔹 Créer ou récupérer une conversation DIRECT
   async getOrCreateDm(
@@ -13,6 +13,33 @@ export class DmService {
   ) {
     if (!recipientId && !recipientEmail) {
       throw new ForbiddenException('Destinataire invalide');
+    }
+
+    // 🔍 Récupérer les infos de l'expéditeur pour vérifier l'email
+    const sender = await this.prisma.user.findUnique({ where: { id: senderId } });
+    if (!sender) {
+      throw new ForbiddenException('Expéditeur inconnu');
+    }
+
+    // ❌ Empêcher l'auto-messagerie par ID
+    if (recipientId === senderId) {
+      throw new ForbiddenException('Auto-messagerie interdite');
+    }
+
+    // ❌ Empêcher l'auto-messagerie par Email
+    if (recipientEmail && recipientEmail.toLowerCase() === sender.email.toLowerCase()) {
+      throw new ForbiddenException('Auto-messagerie interdite (email)');
+    }
+
+    // 🔄 Tenter de récupérer l'ID si l'email existe déjà en base
+    if (!recipientId && recipientEmail) {
+      const userByEmail = await this.prisma.user.findUnique({
+        where: { email: recipientEmail.toLowerCase() }
+      });
+      if (userByEmail) {
+        recipientId = userByEmail.id;
+        recipientEmail = undefined;
+      }
     }
 
     // 1️⃣ chercher conversation existante
@@ -28,6 +55,13 @@ export class DmService {
             : { members: { some: { invitedEmail: recipientEmail } } },
         ],
       },
+      include: {
+        members: true,
+        messages: {
+          take: 1,
+          orderBy: { createdAt: 'desc' }
+        }
+      }
     });
 
     if (existing) return existing;
@@ -45,6 +79,10 @@ export class DmService {
           ],
         },
       },
+      include: {
+        members: true,
+        messages: true,
+      }
     });
   }
 
@@ -61,19 +99,14 @@ export class DmService {
   }
 
   // 🔹 Envoi message
-  async sendMessage(
-    conversationId: string,
-    senderId: string,
-    senderEmail: string,
-    content: string,
-  ) {
-    return this.prisma.message.create({
-      data: {
-        content,
-        senderId,
-        senderEmail,
+  async canSendMessage(userId: string, conversationId: string) {
+    const member = await this.prisma.conversationMember.findFirst({
+      where: {
         conversationId,
+        userId,
       },
     });
+
+    return !!member;
   }
 }
